@@ -1,5 +1,8 @@
 package lesson4;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class Task1 {
     private volatile char currentLetter = 'A';
     private final Object monitor = new Object();
@@ -30,14 +33,13 @@ public class Task1 {
         }
     }
 
-
-    public void chainOfThreadsToStart() {
-        new Thread(() -> printLetter('C')).start();
-        new Thread(() -> printLetter('B')).start();
-        new Thread(() -> printLetter('A')).start();
-    }
-
     public static void main(String[] args) {
-        new Task1().chainOfThreadsToStart();
+        Task1 task1 = new Task1();
+        ExecutorService service = Executors.newFixedThreadPool(3);
+        for (int i = 0; i < 3; i++) {
+            int finalI = i;
+            service.execute(() -> task1.printLetter((char) ('A' + finalI)));
+        }
+        service.shutdown();
     }
 }
