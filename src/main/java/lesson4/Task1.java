@@ -1,7 +1,6 @@
 package lesson4;
 
 public class Task1 {
-
     private volatile char currentLetter = 'A';
     private final Object monitor = new Object();
     private static final int NUMBER_TO_REPEAT = 5;
