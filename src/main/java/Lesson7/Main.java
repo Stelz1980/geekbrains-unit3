@@ -16,42 +16,39 @@ public class Main {
     }
 
     public static void testClass(Class clazz) {
-
-        for (Method method : clazz.getMethods()) {
-            if (method.getAnnotation(BeforeSuite.class) != null) {
-                try {
-                    method.invoke(null);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-
+        List<Method> beforeMethodList = new ArrayList<>();
+        List<Method> afterMethodList = new ArrayList<>();
         List<Method> testMethodList = new ArrayList<>();
 
         for (Method method : clazz.getMethods()) {
-            if (method.getAnnotation(Test.class) != null) {
+            if (method.getAnnotation(BeforeSuite.class) != null) {
+                beforeMethodList.add(method);
+            } else if (method.getAnnotation(AfterSuite.class) != null) {
+                afterMethodList.add(method);
+            } else if (method.getAnnotation(Test.class) != null) {
                 testMethodList.add(method);
             }
         }
 
-        for (Method method : clazz.getMethods()) {
-            if (method.getAnnotation(AfterSuite.class) != null) {
-                try {
-                    method.invoke(null);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-
-
+        runMethods(beforeMethodList);
+        Collections.sort(testMethodList, (o1, o2) -> (
+                o1.getAnnotation(Test.class).priority() > o2.getAnnotation(Test.class).priority()) ? 1 : -1);
+        runMethods(testMethodList);
+        runMethods(afterMethodList);
 
     }
+
+    private static void runMethods(List<Method> methodList) {
+        for (Method m : methodList) {
+            try {
+                m.invoke(null);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+
 }

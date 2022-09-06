@@ -38,12 +38,12 @@ public class TestMethods {
 
     @Test(priority = 5)
     public static void test5() {
-        System.out.println("test3");
+        System.out.println("test5");
     }
 
     @Test(priority = 6)
     public static void test6() {
-        System.out.println("test4");
+        System.out.println("test6");
     }
 
     @Test(priority = 7)
